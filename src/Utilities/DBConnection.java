@@ -46,6 +46,7 @@ public class DBConnection {
 	}
 	
 	public void loginUser(User user) {
+		// Todo validate and login user
 		try {
 			PreparedStatement ps = conn.prepareStatement("select usertype from userinformation where username=? AND password=?");
 			ps.setString(1, user.getUserName());
