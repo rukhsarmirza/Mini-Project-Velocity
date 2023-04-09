@@ -53,7 +53,6 @@ public class ProductManagement {
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			scanner.close();
 			conn.close();
 		}
 	}
@@ -80,7 +79,6 @@ public class ProductManagement {
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			scanner.close();
 			conn.close();
 		}
 	}
@@ -205,13 +203,26 @@ public class ProductManagement {
 					ps1.setInt(2, (rs.getInt(4)));
 					ps1.executeUpdate();
 					
+					// Statement to add row in order history table after buy
+					ps1 = conn.prepareStatement("insert into orderhistory values(?, ?, ?)");
+					ps1.setInt(1, Login.userId);
+					ps1.setInt(2, rs.getInt(4));
+					ps1.setInt(3, rs.getInt(3));
+					int rowCount = ps1.executeUpdate();
+					if(rowCount == 0) {
+						System.out.println("Error updating order history");
+					}
+					
 					// Statement to remove rows from cart table after buy
-					PreparedStatement ps3 = conn.prepareStatement("DELETE FROM cart\r\n" +
+					ps1 = conn.prepareStatement("DELETE FROM cart\r\n" +
 							"where product_id=? AND user_id=? AND quantity=?");
-					ps3.setInt(1, rs.getInt(4));
-					ps3.setInt(2, Login.userId);
-					ps3.setInt(3, rs.getInt(3));
-					ps3.executeUpdate();
+					ps1.setInt(1, rs.getInt(4));
+					ps1.setInt(2, Login.userId);
+					ps1.setInt(3, rs.getInt(3));
+					int removeRowCount = ps1.executeUpdate();
+					if (removeRowCount == 0) {
+						System.out.println("Error in deleteing from cart");
+					}
 					
 				} while(rs.next());
 				System.out.println("Total Bill Amount>> "+totalAmount);

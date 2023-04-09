@@ -13,6 +13,7 @@ import com.usermanagement.UserManagement;
 
 public class ECommerce {
 	static List<Product> pl;
+	static Scanner scanner = new Scanner(System.in);
 	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
@@ -43,7 +44,6 @@ public class ECommerce {
 		}
 		
 		System.out.println("Enter your choice - ");
-		Scanner scanner = new Scanner(System.in);
 		int userInput = scanner.nextInt();
 		performAction(userInput);
 	}
@@ -62,6 +62,7 @@ public class ECommerce {
 				showMenu(true);
 				break;
 			case 3:
+			case 13:
 				pl = pm.getAllProducts();
 				showMenu(false);
 				break;
@@ -107,6 +108,7 @@ public class ECommerce {
 					} catch (SQLException e) {
 						e.printStackTrace();
 					}
+					showMenu(false);
 				} else {
 					System.out.println("**Please note: Only Admin can add products.");
 					showMenu(false);
@@ -117,10 +119,28 @@ public class ECommerce {
 					ProductManagement productManagement = new ProductManagement();
 					try {
 						productManagement.getProductCount();
-						showMenu(false);
 					} catch (SQLException e) {
 						e.printStackTrace();
 					}
+					showMenu(false);
+				} else {
+					System.out.println("**Please note: You cannot perform this action.");
+					showMenu(false);
+				}
+				break;
+			case 11: 
+				if (isLoggedIn() && getUsertype().equalsIgnoreCase("admin")) {
+					UserManagement um = new UserManagement();
+					um.getAllUsers();
+				} else {
+					System.out.println("**Please note: You cannot perform this action.");
+					showMenu(false);
+				}
+				break;
+			case 12: 
+				if (isLoggedIn() && getUsertype().equalsIgnoreCase("admin")) {
+					UserManagement um = new UserManagement();
+					um.getUserHistory(7);
 				} else {
 					System.out.println("**Please note: You cannot perform this action.");
 					showMenu(false);

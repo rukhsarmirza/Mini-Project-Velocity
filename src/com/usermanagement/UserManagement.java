@@ -1,6 +1,13 @@
 package com.usermanagement;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
+
+import com.products.Product;
 
 import Utilities.DBConnection;
 
@@ -42,7 +49,60 @@ public class UserManagement {
 		user.setMobileNumber(mobileNo);
 		
 		dbConn.addUser(user);
+	}
+
+	public void getAllUsers() {
+
+		DBConnection dbConnectio = new DBConnection();
+		Connection conn = dbConnectio.getConnection();
 		
-		scanner.close();
+		try {
+			PreparedStatement ps = conn.prepareStatement("select * from userinformation");
+			ResultSet rs = ps.executeQuery();
+			if(rs.next()) {
+				do {					
+					System.out.println("User Id>> "+rs.getInt(1));
+					System.out.println("First Name>> "+rs.getString(2));
+					System.out.println("Last Name>> "+rs.getString(3));
+					System.out.println("City>> "+rs.getString(6));
+					System.out.println("Mail Id>> "+rs.getString(7));
+					System.out.println("Mobile>> "+rs.getString(8));
+					System.out.println("User Type>> "+rs.getString(9));
+					System.out.println("----------------------------");
+				}while(rs.next());
+				
+			} else {
+				System.out.println("Users not found");
+			}
+
+			conn.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void getUserHistory(int userId) {
+
+		DBConnection dbConnectio = new DBConnection();
+		Connection conn = dbConnectio.getConnection();
+		
+		try {
+			PreparedStatement ps = conn.prepareStatement("select userinformation.firstname, product.product_name, orderhistory.quantity from orderhistory \r\n" + 
+					"INNER JOIN userinformation ON orderhistory.user_id = userinformation.id \r\n" + 
+					"INNER JOIN product ON orderhistory.product_id = product.product_id where user_id=?");
+			ps.setInt(1, userId);
+			ResultSet rs = ps.executeQuery();
+			if(rs.next()) {
+				do {
+					System.out.println("User name: "+rs.getString(1)+" | Product Name: " +rs.getString(2)+ " | Quantity: "+ rs.getInt(3));
+				} while(rs.next());
+			} else {
+				System.out.println("No items in your cart.");
+			}
+
+			conn.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }
