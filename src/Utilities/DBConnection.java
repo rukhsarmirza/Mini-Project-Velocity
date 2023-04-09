@@ -12,15 +12,16 @@ import com.usermanagement.User;
 public class DBConnection {
 	Connection conn;
 	
-	public void getConnection() {
+	public Connection getConnection() {
 		String connClass = "com.mysql.jdbc.Driver";
 		String dbPath = "jdbc:mysql://localhost:3306/e-commerce";
 		try {
 			Class.forName(connClass);
 			conn = DriverManager.getConnection(dbPath, "root", "Ti1@d234");
-			
+			return conn;
 		} catch(Exception exception) {
 			exception.printStackTrace();
+			return null;
 		}
 	}
 	
@@ -48,14 +49,15 @@ public class DBConnection {
 	public void loginUser(User user) {
 		// Todo validate and login user
 		try {
-			PreparedStatement ps = conn.prepareStatement("select usertype from userinformation where username=? AND password=?");
+			PreparedStatement ps = conn.prepareStatement("select id, usertype from userinformation where username=? AND password=?");
 			ps.setString(1, user.getUserName());
 			ps.setString(2, user.getPassword());
 			ResultSet rs = ps.executeQuery();
 			if(rs.next()) {
 			 do{
 				System.out.println("logged in successfully.");
-				Login.userType = rs.getString(1);
+				Login.userId = rs.getInt(1);
+				Login.userType = rs.getString(2);
 			 } while(rs.next());
 			} else {
 				System.out.println("Invalid Username and password");
