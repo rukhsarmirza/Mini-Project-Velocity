@@ -28,7 +28,6 @@ public class UserManagement {
 		System.out.println("Enter the password>> ");
 		String password = scanner.next();
 		user.setPassword(password);
-		
 
 		System.out.println("Enter the city>> ");
 		String city = scanner.next();

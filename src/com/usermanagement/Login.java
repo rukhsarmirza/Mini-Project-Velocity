@@ -6,6 +6,7 @@ import Utilities.DBConnection;
 
 public class Login {
 	public static String userType;
+	public static int userId;
 	
 	public void loginUser() {
 		DBConnection dbConn = new DBConnection();
@@ -23,7 +24,6 @@ public class Login {
 		user.setPassword(password);
 		
 		dbConn.loginUser(user);
-		System.out.println(userType);
 	}
 	
 }
