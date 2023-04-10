@@ -1,21 +1,29 @@
 package com.velocity.miniproject.ecommers;
 
+import java.sql.SQLException;
+import java.util.List;
 import java.util.Scanner;
 
 import Utilities.DBConnection;
+
+import com.products.Product;
+import com.products.ProductManagement;
 import com.usermanagement.Login;
 import com.usermanagement.UserManagement;
 
 public class ECommerce {
-
+	static List<Product> pl;
+	static Scanner scanner = new Scanner(System.in);
+	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		ECommerce ecommerce = new ECommerce();
-		ecommerce.showMenu();
+		showMenu(true);
 	}
 	
-	public void showMenu() {
-		System.out.println("Welcome to E-Commerce based application\r\n" + 
+	public static void showMenu(boolean showFullMessage) {
+		if(showFullMessage) {
+			System.out.println("----------------------------\r\n"+
+				"Welcome to E-Commerce based application\r\n" + 
 				"User Operation\r\n" + 
 				"1. User Registration\r\n" + 
 				"2. User Login\r\n" + 
@@ -33,22 +41,120 @@ public class ECommerce {
 				"Guest Operation\r\n\n" + 
 				"13. View product item\r\n" + 
 				"14. Not purchase item");
+		}
 		
 		System.out.println("Enter your choice - ");
-		Scanner scanner = new Scanner(System.in);
 		int userInput = scanner.nextInt();
+		performAction(userInput);
+	}
 		
+	public static void performAction(int userInput) {
+		ProductManagement pm = new ProductManagement();
 		switch(userInput) {
 			case 1:
 				UserManagement userManagement = new UserManagement();
 				userManagement.addUser();
+				showMenu(true);
 				break;
 			case 2:
 				Login login = new Login();
 				login.loginUser();
+				showMenu(true);
+				break;
+			case 3:
+			case 13:
+				pl = pm.getAllProducts();
+				showMenu(false);
+				break;
+			case 4:
+				if (isLoggedIn() && getUsertype().equalsIgnoreCase("normal")) {
+					pm.addToCart(pl);
+					
+					Scanner scanner = new Scanner(System.in);
+					System.out.println("DO you want to view cart (Yes/No)");
+					String showCart = scanner.next();
+					
+					if (showCart.equalsIgnoreCase("yes")) {
+						performAction(5);
+					} else {
+						showMenu(false);
+					}
+				} else {
+					System.out.println("**Please login first");
+					showMenu(false);
+				}
+				break;
+			case 5:
+				if (isLoggedIn() && getUsertype().equalsIgnoreCase("normal")) {
+					pm.showCart();
+				} else {
+					System.out.println("**Please login first");
+				}
+				showMenu(false);
+				break;
+			case 6:
+				if (isLoggedIn() && getUsertype().equalsIgnoreCase("normal")) {
+					pm.buyItem();
+				} else {
+					System.out.println("**Please login first");
+				}
+				showMenu(false);
+				break;
+			case 7:
+				if (isLoggedIn() && getUsertype().equalsIgnoreCase("admin")) {
+					ProductManagement productManagement = new ProductManagement();
+					try {
+						productManagement.addProduct();
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
+					showMenu(false);
+				} else {
+					System.out.println("**Please note: Only Admin can add products.");
+					showMenu(false);
+				}
+				break;
+			case 10:
+				if (isLoggedIn() && getUsertype().equalsIgnoreCase("admin")) {
+					ProductManagement productManagement = new ProductManagement();
+					try {
+						productManagement.getProductCount();
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
+					showMenu(false);
+				} else {
+					System.out.println("**Please note: You cannot perform this action.");
+					showMenu(false);
+				}
+				break;
+			case 11: 
+				if (isLoggedIn() && getUsertype().equalsIgnoreCase("admin")) {
+					UserManagement um = new UserManagement();
+					um.getAllUsers();
+				} else {
+					System.out.println("**Please note: You cannot perform this action.");
+					showMenu(false);
+				}
+				break;
+			case 12: 
+				if (isLoggedIn() && getUsertype().equalsIgnoreCase("admin")) {
+					UserManagement um = new UserManagement();
+					um.getUserHistory(7);
+				} else {
+					System.out.println("**Please note: You cannot perform this action.");
+					showMenu(false);
+				}
+				break;
 		}
-		
-		scanner.close();
 	}
+	
+	public static boolean isLoggedIn() {
+		return new Boolean(Login.userType != null);
+	}
+	
+	public static String getUsertype() {
+		return Login.userType;
+	}	
 
 }
